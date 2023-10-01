@@ -3,9 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Magic } from "magic-sdk";
 import { useSetUser } from "./UserContext";
-
-const rpcUrl = "https://rpc-mumbai.maticvigil.com/";
-const chainId = 80001;
+import { ethrProvider } from "@/lib/config";
 
 interface MagicContextValue {
   connect: () => Promise<string[]>;
@@ -38,8 +36,8 @@ export function MagicProvider({ children }: { children: React.ReactNode }) {
       process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY as string,
       {
         network: {
-          rpcUrl,
-          chainId,
+          rpcUrl: ethrProvider.rpcUrl,
+          chainId: ethrProvider.chainId,
         },
       }
     );
@@ -57,7 +55,7 @@ export function MagicProvider({ children }: { children: React.ReactNode }) {
         await magic.user.logout();
         setUser(undefined);
       },
-      getChainId: () => chainId,
+      getChainId: () => ethrProvider.chainId,
     });
   }, [setUser]);
 

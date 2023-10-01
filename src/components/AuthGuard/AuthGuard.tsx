@@ -72,7 +72,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   return (
     <Web3Provider value={web3}>
-      <AuthUserProvider value={user}>{children}</AuthUserProvider>
+      <AuthUserProvider user={user}>{children}</AuthUserProvider>
     </Web3Provider>
   );
 }
