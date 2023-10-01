@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { MagicProvider } from "@/components/contexts/MagicContext";
+import { Toaster } from "@/components/ui/Toast/Toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <UserContextProvider>
           <MagicProvider>{children}</MagicProvider>
         </UserContextProvider>
+        <Toaster />
       </body>
     </html>
   );

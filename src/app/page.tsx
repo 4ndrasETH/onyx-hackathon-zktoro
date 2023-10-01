@@ -1,5 +1,5 @@
 import AuthGuard from "@/components/AuthGuard/AuthGuard";
-import Home from "./Home";
+import Home from "./home/Home";
 
 export default function Index() {
   return (
