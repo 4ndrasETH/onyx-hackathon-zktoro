@@ -1,11 +1,11 @@
 "use client";
 
-import { BrowserProvider } from "ethers";
+import { providers } from "ethers";
 import React from "react";
 
-export const Web3Context = React.createContext<BrowserProvider | undefined>(
-  undefined
-);
+export const Web3Context = React.createContext<
+  providers.Web3Provider | undefined
+>(undefined);
 
 export function useWeb3() {
   const web3 = React.useContext(Web3Context);
