@@ -9,6 +9,7 @@ import {
 import CreateNewNodeRow, { CreateNewNodeRowProps } from "./CreateNewNodeRow";
 import VerifyStatus from "./VerifyStatus";
 import ControllingStatus from "./ControllingStatus";
+import { truncateDidKey } from "@/lib/utils";
 
 export interface Node {
   did: string;
@@ -37,9 +38,25 @@ export default function NodeTable({ nodes, setNodes }: Props) {
         ) : (
           nodes.map(({ did, verified, vc }) => (
             <TableRow key={did}>
-              <TableCell className="font-medium">{did}</TableCell>
+              <TableCell className="font-medium">
+                {truncateDidKey(did)}
+              </TableCell>
               <TableCell className="text-right">
-                <VerifyStatus status={verified} />
+                <VerifyStatus
+                  status={verified}
+                  vc={vc}
+                  updateNode={(verified) => {
+                    // @ts-expect-error
+                    setNodes((prevNodes: Node[]) =>
+                      prevNodes.map((node: Node) => {
+                        if (node.did === did) {
+                          return { ...node, verified };
+                        }
+                        return node;
+                      })
+                    );
+                  }}
+                />
               </TableCell>
               <TableCell className="text-right">
                 <ControllingStatus

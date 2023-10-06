@@ -11,6 +11,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert";
 export default function Home() {
   const [nodes, setNodes] = useState<Node[]>([]);
 
+  console.log(nodes);
+
   return (
     <Fragment>
       <NavBar button={<ProfileMenu />} />
@@ -21,7 +23,7 @@ export default function Home() {
             <RocketIcon className="h-4 w-4" />
             <AlertTitle>Tip:</AlertTitle>
             <AlertDescription>
-              Create a new node for your strategy below
+              Add a new node for your strategy below
             </AlertDescription>
           </Alert>
         ) : null}
@@ -30,7 +32,7 @@ export default function Home() {
             <RocketIcon className="h-4 w-4" />
             <AlertTitle>Tip:</AlertTitle>
             <AlertDescription>
-              Issue a proof that you will control your node
+              Issue a proof that you will control the node
             </AlertDescription>
           </Alert>
         ) : null}

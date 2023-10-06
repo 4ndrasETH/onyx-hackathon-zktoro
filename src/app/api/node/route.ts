@@ -1,15 +1,29 @@
-import { ethrProvider } from "@/lib/config";
-import { DIDWithKeys, EthrDIDMethod } from "@jpmorganchase/onyx-ssi-sdk";
+import { base58btc } from "multiformats/bases/base58";
 import { NextResponse } from "next/server";
 
+function hexToBytes(hex: string) {
+  let bytes = [];
+  for (let c = 0; c < hex.length; c += 2)
+    bytes.push(parseInt(hex.substring(c, 2), 16));
+  return bytes;
+}
+
 export async function POST(request: Request) {
-  // TODO: Replace this with an API call to the actual node or NodeManager
   const res = await request.json();
-  const subjectDid: string = res.did;
-  const didEthr = new EthrDIDMethod(ethrProvider);
-  const issuerEthrDid: DIDWithKeys = await didEthr.create();
-  return NextResponse.json({
-    nodeDid: issuerEthrDid.did,
-    subjectDid: subjectDid,
-  });
+  const publicKey: string = res.publicKey;
+
+  try {
+    const pubKey = new Uint8Array(hexToBytes(publicKey));
+    const buffer = new Uint8Array(2 + pubKey.length);
+    buffer[0] = 0xed;
+    buffer[1] = 0x01;
+    buffer.set(pubKey, 2);
+    const did = "z6Mk" + base58btc.baseEncode(buffer);
+
+    return NextResponse.json({
+      nodeDid: did,
+    });
+  } catch (error) {
+    return NextResponse.json({ error: "Wrong public key" });
+  }
 }

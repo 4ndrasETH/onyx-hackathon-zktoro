@@ -2,7 +2,6 @@ import { useAuthUser } from "@/components/contexts/AuthUserContext";
 import { Button } from "@/components/ui/Button";
 import { toast } from "@/components/ui/Toast/useToast";
 import Muted from "@/components/ui/Typography/Muted";
-import Small from "@/components/ui/Typography/Small";
 import { delay } from "@/lib/utils";
 import { CheckIcon, PlusIcon, ReloadIcon } from "@radix-ui/react-icons";
 import React, { useCallback } from "react";
@@ -61,7 +60,11 @@ export default function ControllingStatus({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ vc: signedJWT }),
+      body: JSON.stringify({
+        vc: signedJWT,
+        issuerPublicKey: issuerDid.address,
+        holderDid: subjectDid,
+      }),
     });
     const verifyVcJson = await verifyVcRes.json();
     if (verifyVcJson.error) {
@@ -78,6 +81,11 @@ export default function ControllingStatus({
     updateNode(signedVc);
     setStatusMsg(undefined);
     setLoading(false);
+    toast({
+      variant: "default",
+      title: "Success!",
+      description: "Proof issued and uploaded to node",
+    });
   }, [issuerDid, subjectDid, updateNode]);
 
   if (vc) {
