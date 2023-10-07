@@ -10,17 +10,21 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  // call signVPTemporary
-  // node signs the VP
-  const signVPTemporaryRes = await fetch(
-    "http://13.212.246.61/signVP_temporary"
-  );
-  await signVPTemporaryRes.text();
-  // GET VP from node
-  const retrieveVPRes = await fetch("http://13.212.246.61/retrieveVP");
-  const vp = await retrieveVPRes.text();
-
   try {
+    // call signVPTemporary
+    // node signs the VP
+    const signVPTemporaryRes = await fetch(
+      "http://13.212.246.61/signVP_temporary",
+      { cache: "no-store" }
+    );
+    await signVPTemporaryRes.text();
+
+    // GET VP from node
+    const retrieveVPRes = await fetch("http://13.212.246.61/retrieveVP", {
+      cache: "no-store",
+    });
+    const vp = await retrieveVPRes.text();
+
     const didKey = new KeyDIDMethod();
     const didEthr = new EthrDIDMethod(ethrProvider);
     const didResolver = getSupportedResolvers([didKey, didEthr]);
