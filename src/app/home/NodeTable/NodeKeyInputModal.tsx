@@ -10,11 +10,12 @@ import {
 } from "@/components/ui/Dialog";
 import { IdCardIcon, PlusIcon, ReloadIcon } from "@radix-ui/react-icons";
 import React, { useCallback, useEffect, useState } from "react";
-import { useDebounce } from "usehooks-ts";
+import { useDebounce, useReadLocalStorage } from "usehooks-ts";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert";
 import { truncateDidKey } from "@/lib/utils";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
+import { useReadNodes } from "@/components/contexts/NodesContext";
 
 function NodeDidCard({ did }: { did: string }) {
   return (
@@ -39,30 +40,41 @@ export default function NodeKeyInputModal({ trigger, onSubmit }: Props) {
   const [loading, setLoading] = useState(false);
   const [nodeDid, setNodeDid] = useState<string | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
+  const nodes = useReadNodes();
 
-  const transformPublicKeyToDid = useCallback(async (keyParam: string) => {
-    setLoading(true);
-    if (keyParam.length <= 0) {
+  const transformPublicKeyToDid = useCallback(
+    async (keyParam: string) => {
+      setLoading(true);
       setNodeDid(undefined);
+      setErrorMessage(undefined);
+      if (keyParam.length <= 0) {
+        setLoading(false);
+        return;
+      }
+      const res = await fetch("/api/node", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ publicKey: keyParam }),
+      });
+      const json = await res.json();
+      if (json.error) {
+        setErrorMessage(json.error);
+        setLoading(false);
+        return;
+      }
+      const nodeDid = `did:key:${json.nodeDid}`;
+      if (nodes.some(({ did }) => did === nodeDid)) {
+        setErrorMessage("Node already exists");
+        setLoading(false);
+        return;
+      }
+      setNodeDid(nodeDid);
       setLoading(false);
-      return;
-    }
-    const res = await fetch("/api/node", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ publicKey: keyParam }),
-    });
-    const json = await res.json();
-    if (json.error) {
-      setErrorMessage(json.error);
-      setLoading(false);
-      return;
-    }
-    setNodeDid(`did:key:${json.nodeDid}`);
-    setLoading(false);
-  }, []);
+    },
+    [nodes]
+  );
 
   useEffect(() => {
     transformPublicKeyToDid(debouncedKey);
@@ -92,6 +104,7 @@ export default function NodeKeyInputModal({ trigger, onSubmit }: Props) {
               }
             />
           </div>
+          <p className="text-destructive text-sm">{errorMessage}</p>
           {nodeDid ? <NodeDidCard did={nodeDid} /> : null}
         </div>
         <DialogFooter>

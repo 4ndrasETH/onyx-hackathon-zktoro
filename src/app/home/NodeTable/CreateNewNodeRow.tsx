@@ -8,19 +8,17 @@ import { delay } from "@/lib/utils";
 import NodeKeyInputModal from "./NodeKeyInputModal";
 
 export interface CreateNewNodeRowProps {
-  setNodes: (nodes: Node[]) => void;
+  append: (node: Node) => void;
 }
 
-export default function CreateNewNodeRow({ setNodes }: CreateNewNodeRowProps) {
-  const { did } = useAuthUser();
-
+export default function CreateNewNodeRow({ append }: CreateNewNodeRowProps) {
   return (
     <TableRow key="new-node">
       <TableCell className="font-medium italic">New Node</TableCell>
       <TableCell colSpan={2} className="text-right">
         <NodeKeyInputModal
           onSubmit={(nodeDid: string) => {
-            setNodes([{ did: nodeDid, verified: false }]);
+            append({ did: nodeDid, verified: false });
           }}
           trigger={
             <Button>

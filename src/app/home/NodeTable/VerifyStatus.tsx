@@ -10,19 +10,24 @@ interface Props {
 export default function VerifyStatus({ status, vc, updateNode }: Props) {
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const getVPAndVerify = async () => {
     if (!vc || status) return;
     setLoading(true);
 
-    async function getVPAndVerify() {
-      const newStatusRes = await fetch(`/api/vp`);
-      const newStatusJson = await newStatusRes.json();
-      const newStatus: boolean = newStatusJson.status;
-      await delay(5000);
-      updateNode(newStatus);
-      setLoading(false);
+    let newStatus = false;
+    const newStatusRes = await fetch(`/api/vp`);
+    const newStatusJson = await newStatusRes.json();
+    if (newStatusJson.error) {
+      console.error(newStatusJson.error);
+    } else {
+      newStatus = newStatusJson.status;
     }
-     // deplay 5s to allow VP to sign properly
+    await delay(5000);
+    updateNode(newStatus);
+    setLoading(false);
+  };
+
+  useEffect(() => {
     getVPAndVerify();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vc, status]);
@@ -38,7 +43,7 @@ export default function VerifyStatus({ status, vc, updateNode }: Props) {
   }
 
   return (
-    <div className="flex items-center justify-end">
+    <div className="flex items-center justify-end" onClick={getVPAndVerify}>
       {status ? (
         <div className="rounded-full bg-green-500 p-0.5">
           <CheckIcon className="h-6 w-6 text-primary-foreground" />

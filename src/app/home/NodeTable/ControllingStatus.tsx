@@ -7,23 +7,21 @@ import { CheckIcon, PlusIcon, ReloadIcon } from "@radix-ui/react-icons";
 import React, { useCallback } from "react";
 import { EthrDID } from "ethr-did";
 
-import { createVerifiableCredentialJwt, Issuer} from 'did-jwt-vc';
+import { createVerifiableCredentialJwt, Issuer } from "did-jwt-vc";
 interface Props {
   did: string;
   vc?: string;
   updateNode: (vc: string) => void;
 }
 
-
-function convertIssuer(issuerDid : EthrDID){
+function convertIssuer(issuerDid: EthrDID) {
   const issuer = {
-      did: issuerDid.did,
-      signer: issuerDid.signer,
-      alg: "ES256K"
-  }
-  return issuer as Issuer
+    did: issuerDid.did,
+    signer: issuerDid.signer,
+    alg: "ES256K",
+  };
+  return issuer as Issuer;
 }
-
 
 export default function ControllingStatus({
   did: subjectDid,
@@ -54,37 +52,62 @@ export default function ControllingStatus({
       return;
     }
     const vcTemplate = vcTemplateJson.vc;
-    
+
     setStatusMsg("Creating signing delegate...");
     await delay(2000);
-    // Add signing delegate
-    await issuerDid.createSigningDelegate();
 
-    setStatusMsg("Signing Proof...");
-    // Sign VC
-    // const signedJWT = await issuerDid.signJWT(vcTemplate);
-    
-    const signedJWT = await createVerifiableCredentialJwt(vcTemplate,convertIssuer(issuerDid))
-    console.log(signedJWT)
-    
-    await delay(1000);
+    try {
+      // Add signing delegate
+      await issuerDid.createSigningDelegate();
 
-    setStatusMsg("Verifying Proof...");
-    await delay(1000);
-    // Post VC to Node and Verify
-    const verifyVcRes = await fetch("/api/vc", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        vc: signedJWT,
-        issuerPublicKey: issuerDid.address,
-        holderDid: subjectDid,
-      }),
-    });
-    const verifyVcJson = await verifyVcRes.json();
-    if (verifyVcJson.error) {
+      setStatusMsg("Signing Proof...");
+      // Sign VC
+      // const signedJWT = await issuerDid.signJWT(vcTemplate);
+
+      const signedJWT = await createVerifiableCredentialJwt(
+        vcTemplate,
+        convertIssuer(issuerDid)
+      );
+      console.log(signedJWT);
+
+      await delay(1000);
+
+      setStatusMsg("Verifying Proof...");
+      await delay(1000);
+      // Post VC to Node and Verify
+      const verifyVcRes = await fetch("/api/vc", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          vc: signedJWT,
+          issuerPublicKey: issuerDid.address,
+          holderDid: subjectDid,
+        }),
+      });
+      const verifyVcJson = await verifyVcRes.json();
+      if (verifyVcJson.error) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+        });
+        setStatusMsg(undefined);
+        setLoading(false);
+        return;
+      }
+
+      const signedVc = verifyVcJson.vc;
+      updateNode(signedVc);
+      setStatusMsg(undefined);
+      setLoading(false);
+      toast({
+        variant: "default",
+        title: "Success!",
+        description: "Proof issued and uploaded to node",
+      });
+    } catch (err) {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -94,17 +117,6 @@ export default function ControllingStatus({
       setLoading(false);
       return;
     }
-
-    
-    const signedVc = verifyVcJson.vc;
-    updateNode(signedVc);
-    setStatusMsg(undefined);
-    setLoading(false);
-    toast({
-      variant: "default",
-      title: "Success!",
-      description: "Proof issued and uploaded to node",
-    });
   }, [issuerDid, subjectDid, updateNode]);
 
   if (vc) {
