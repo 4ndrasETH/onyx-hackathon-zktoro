@@ -18,11 +18,11 @@ export default function VerifyStatus({ status, vc, updateNode }: Props) {
       const newStatusRes = await fetch(`/api/vp`);
       const newStatusJson = await newStatusRes.json();
       const newStatus: boolean = newStatusJson.status;
-      await delay(1000);
+      await delay(5000);
       updateNode(newStatus);
       setLoading(false);
     }
-
+     // deplay 5s to allow VP to sign properly
     getVPAndVerify();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vc, status]);

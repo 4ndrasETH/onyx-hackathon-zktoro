@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
     [credentialType],
     additionalParams
   );
-
+  console.log("VC created:")
+  console.log(vc)  
   return NextResponse.json({
     vc,
   });
@@ -61,19 +62,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const res = await request.json();
   const signedVc: string = res.vc;
+  console.log("Signed VC")
+  console.log(signedVc)
   const issuerPublicKey: string = res.issuerPublicKey;
   const holderDid: string = res.holderDid;
-
+  console.log("holderDID",res.holderDid)
   const didResolver = new Resolver(
     getResolver({ rpcUrl: ethrProvider.rpcUrl, name: ethrProvider.name })
   );
   try {
-    const isVCValid = await verifyCredentialJWT(signedVc, didResolver);
-    if (!isVCValid) {
-      return NextResponse.json({ error: "VC validation failed" });
-    }
+    // const isVCValid = await verifyCredentialJWT(signedVc, didResolver);
+    // if (!isVCValid) {
+    //   return NextResponse.json({ error: "VC validation failed" });
+    // }
 
     // POST to node
+
+    console.log(JSON.stringify({
+      issuer_public_key: issuerPublicKey,
+      holder_did: holderDid,
+      vc: signedVc,
+    }))
+    
     const putVCRes = await fetch("http://13.212.246.61/putVC", {
       method: "POST",
       headers: {

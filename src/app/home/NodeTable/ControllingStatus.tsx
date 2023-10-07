@@ -5,12 +5,25 @@ import Muted from "@/components/ui/Typography/Muted";
 import { delay } from "@/lib/utils";
 import { CheckIcon, PlusIcon, ReloadIcon } from "@radix-ui/react-icons";
 import React, { useCallback } from "react";
+import { EthrDID } from "ethr-did";
 
+import { createVerifiableCredentialJwt, Issuer} from 'did-jwt-vc';
 interface Props {
   did: string;
   vc?: string;
   updateNode: (vc: string) => void;
 }
+
+
+function convertIssuer(issuerDid : EthrDID){
+  const issuer = {
+      did: issuerDid.did,
+      signer: issuerDid.signer,
+      alg: "ES256K"
+  }
+  return issuer as Issuer
+}
+
 
 export default function ControllingStatus({
   did: subjectDid,
@@ -41,7 +54,7 @@ export default function ControllingStatus({
       return;
     }
     const vcTemplate = vcTemplateJson.vc;
-
+    
     setStatusMsg("Creating signing delegate...");
     await delay(2000);
     // Add signing delegate
@@ -49,7 +62,11 @@ export default function ControllingStatus({
 
     setStatusMsg("Signing Proof...");
     // Sign VC
-    const signedJWT = await issuerDid.signJWT(vcTemplate);
+    // const signedJWT = await issuerDid.signJWT(vcTemplate);
+    
+    const signedJWT = await createVerifiableCredentialJwt(vcTemplate,convertIssuer(issuerDid))
+    console.log(signedJWT)
+    
     await delay(1000);
 
     setStatusMsg("Verifying Proof...");
@@ -77,6 +94,8 @@ export default function ControllingStatus({
       setLoading(false);
       return;
     }
+
+    
     const signedVc = verifyVcJson.vc;
     updateNode(signedVc);
     setStatusMsg(undefined);
