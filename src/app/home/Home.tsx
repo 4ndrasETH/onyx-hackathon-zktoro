@@ -29,7 +29,7 @@ function AddNodeTip() {
 function IssueProofTip() {
   const nodes = useReadNodes();
 
-  if (nodes.every(({ vc }) => vc !== undefined)) return null;
+  if (nodes.every(({ vp }) => vp !== undefined)) return null;
   return (
     <Alert>
       <RocketIcon className="h-4 w-4" />
