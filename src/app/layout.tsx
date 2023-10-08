@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/Toast/Toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "zkToro Dashboad",
+  title: "zkToro Dashboard",
   description: "Manage your strategy nodes",
 };
 
