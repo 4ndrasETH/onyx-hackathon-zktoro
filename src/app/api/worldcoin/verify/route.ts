@@ -3,13 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 export type VerifyReply = {
   code: string;
   detail: string;
-  nullifier_hash: string;
+  data: string;
 };
 
 const verifyEndpoint = `${process.env.NEXT_PUBLIC_WLD_API_BASE_URL}/api/v1/verify/${process.env.NEXT_PUBLIC_WLD_APP_ID}`;
 
 export async function POST(req: NextRequest) {
-  //   return new Promise((resolve, reject) => {
   console.log("Received request to verify credential:\n", req.body);
   let reqJson = await req.json();
 
@@ -21,6 +20,7 @@ export async function POST(req: NextRequest) {
     action: reqJson.action,
     signal: reqJson.signal,
   };
+
   console.log("Sending request to World ID /verify endpoint:\n", reqBody);
   let verifyRes = await fetch(verifyEndpoint, {
     method: "POST",
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     `Received ${verifyRes.status} response from World ID /verify endpoint:\n`,
     wldResponse
   );
+
   if (verifyRes.status == 200) {
     // This is where you should perform backend actions based on the verified credential, such as setting a user as "verified" in a database
     // For this example, we'll just return a 200 response and console.log the verified credential
@@ -43,10 +44,16 @@ export async function POST(req: NextRequest) {
       "Credential verified! This user's nullifier hash is: ",
       wldResponse.nullifier_hash
     );
+
+    const data = JSON.stringify({
+      ...reqBody,
+      response: wldResponse,
+    });
+
     return NextResponse.json({
       code: "success",
       detail: "This action verified correctly!",
-      nullifier_hash: wldResponse.nullifier_hash,
+      data,
     });
     //   resolve(void 0);
   } else {

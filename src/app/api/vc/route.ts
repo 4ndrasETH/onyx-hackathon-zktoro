@@ -11,19 +11,30 @@ import { getResolver } from "ethr-did-resolver";
 import path from "path";
 import { ethrProvider } from "@/lib/config";
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const issuerDid = searchParams.get("issuer");
-  const subjectDid = searchParams.get("subject");
+export interface CreateVCTemplateRequestBody {
+  worldcoin: string;
+  issuer: string;
+  subject: string;
+}
 
-  if (!issuerDid || !subjectDid) {
-    return NextResponse.json({ error: "issuer and subject are required" });
+export async function POST(request: NextRequest) {
+  const res = await request.json();
+
+  const worldcoin: string = res.worldcoin;
+  const issuerDid: string = res.issuer;
+  const subjectDid: string = res.subject;
+
+  if (!issuerDid || !subjectDid || !worldcoin) {
+    return NextResponse.json({
+      error: "issuer, subject and worldcoin are required",
+    });
   }
 
   const vcDidKey = (await new KeyDIDMethod().create()).did;
   const credentialType = "PROOF_OF_CONTROLLER";
 
-  const subjectData = { controller: issuerDid };
+  console.log(worldcoin);
+  const subjectData = { controller: issuerDid, worldcoin };
 
   const additionalParams = {
     id: vcDidKey,
@@ -57,55 +68,4 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     vc,
   });
-}
-
-export async function POST(request: NextRequest) {
-  const res = await request.json();
-  const signedVc: string = res.vc;
-  console.log("Signed VC");
-  console.log(signedVc);
-  const issuerPublicKey: string = res.issuerPublicKey;
-  const holderDid: string = res.holderDid;
-  console.log("holderDID", res.holderDid);
-  // const didResolver = new Resolver(
-  //   getResolver({ rpcUrl: ethrProvider.rpcUrl, name: ethrProvider.name })
-  // );
-  try {
-    // const isVCValid = await verifyCredentialJWT(signedVc, didResolver);
-    // if (!isVCValid) {
-    //   return NextResponse.json({ error: "VC validation failed" });
-    // }
-
-    // POST to node
-
-    console.log(
-      JSON.stringify({
-        issuer_public_key: issuerPublicKey,
-        holder_did: holderDid,
-        vc: signedVc,
-      })
-    );
-
-    const putVCRes = await fetch("http://13.212.246.61/putVC", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        issuer_public_key: issuerPublicKey,
-        holder_did: holderDid,
-        vc: signedVc,
-      }),
-    });
-
-    const success = await putVCRes.text();
-    if (success !== "Credential succesfully stored") {
-      return NextResponse.json({ error: "VC upload failed" });
-    }
-
-    return NextResponse.json({ vc: signedVc });
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({ error: "VC upload failed" });
-  }
 }

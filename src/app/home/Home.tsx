@@ -11,7 +11,6 @@ import {
   NodesContextProvider,
   useReadNodes,
 } from "@/components/contexts/NodesContext";
-import WorldCoin from "../login/WorldCoin";
 function AddNodeTip() {
   const nodes = useReadNodes();
 
@@ -22,7 +21,6 @@ function AddNodeTip() {
       <AlertTitle>Tip:</AlertTitle>
       <AlertDescription>
         Add a new node for your strategy below
-        <WorldCoin />
       </AlertDescription>
     </Alert>
   );
@@ -37,8 +35,7 @@ function IssueProofTip() {
       <RocketIcon className="h-4 w-4" />
       <AlertTitle>Tip:</AlertTitle>
       <AlertDescription>
-        Issue a proof that you will control the node
-        <WorldCoin />
+        Issue a proof that will control your node
       </AlertDescription>
     </Alert>
   );

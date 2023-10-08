@@ -8,16 +8,16 @@ import {
 } from "@/components/ui/Table";
 import CreateNewNodeRow, { CreateNewNodeRowProps } from "./CreateNewNodeRow";
 import VerifyStatus from "./VerifyStatus";
-import ControllingStatus from "./ControllingStatus";
 import { truncateDidKey } from "@/lib/utils";
 import { useReadNodes, useSetNodes } from "@/components/contexts/NodesContext";
-import { MinusIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/Button";
 import RemoveNode from "./RemoveNode";
+import VerifyWithWorldcoinButton from "./VerifyWithWorldcoinButton";
+import IssueProofFlow from "./IssueProofFlow";
 
 export interface Node {
   did: string;
   vc?: string;
+  worldcoin?: string;
   verified: boolean;
 }
 
@@ -28,16 +28,15 @@ export default function NodeTable() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">DID</TableHead>
+          <TableHead className="text-left">DID</TableHead>
           <TableHead className="text-right">Verified</TableHead>
-          <TableHead className="text-right">Controlling</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {nodes.map(({ did, verified, vc }) => (
+        {nodes.map(({ did, verified, vc, worldcoin }) => (
           <TableRow key={did}>
-            <TableCell className="font-medium">
-              <div className="flex items-center justify-center gap-2">
+            <TableCell className="font-medium text-left">
+              <div className="flex items-center justify-start gap-2">
                 <RemoveNode
                   onConfirm={() => {
                     remove(did);
@@ -47,22 +46,31 @@ export default function NodeTable() {
               </div>
             </TableCell>
             <TableCell className="text-right">
-              <VerifyStatus
-                status={verified}
-                vc={vc}
-                updateNode={(verified) => {
-                  update(did, "verified", verified);
-                }}
-              />
-            </TableCell>
-            <TableCell className="text-right">
-              <ControllingStatus
-                did={did}
-                vc={vc}
-                updateNode={(vc: string) => {
-                  update(did, "vc", vc);
-                }}
-              />
+              {vc ? (
+                <div className="flex items-center justify-end">
+                  <VerifyStatus
+                    status={verified}
+                    vc={vc}
+                    updateNode={(verified) => {
+                      update(did, "verified", verified);
+                    }}
+                  />
+                </div>
+              ) : worldcoin ? (
+                <IssueProofFlow
+                  did={did}
+                  worldcoin={worldcoin}
+                  updateNode={(vc) => {
+                    update(did, "vc", vc);
+                  }}
+                />
+              ) : (
+                <VerifyWithWorldcoinButton
+                  updateNode={(worldcoin) => {
+                    update(did, "worldcoin", worldcoin);
+                  }}
+                />
+              )}
             </TableCell>
           </TableRow>
         ))}

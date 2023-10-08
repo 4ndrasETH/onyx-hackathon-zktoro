@@ -33,26 +33,14 @@ export default function VerifyStatus({ status, vc, updateNode }: Props) {
   }, [vc, status]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-end">
-        <div className="rounded-full bg-slate-500 w-7 h-7 flex items-center justify-center">
-          <ReloadIcon className="h-5 w-5 text-primary-foreground animate-spin" />
-        </div>
-      </div>
-    );
+    return <ReloadIcon className="h-5 w-5 text-primary animate-spin" />;
+  }
+
+  if (status) {
+    return <CheckIcon className="h-6 w-6 text-green-500" />;
   }
 
   return (
-    <div className="flex items-center justify-end" onClick={getVPAndVerify}>
-      {status ? (
-        <div className="rounded-full bg-green-500 p-0.5">
-          <CheckIcon className="h-6 w-6 text-primary-foreground" />
-        </div>
-      ) : (
-        <div className="rounded-full bg-red-500 p-0.5">
-          <Cross2Icon className="h-6 w-6 text-primary-foreground" />
-        </div>
-      )}
-    </div>
+    <Cross2Icon className="h-6 w-6 text-destructive" onClick={getVPAndVerify} />
   );
 }
