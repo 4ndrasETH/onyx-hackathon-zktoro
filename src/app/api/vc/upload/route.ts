@@ -19,14 +19,6 @@ export async function POST(request: NextRequest) {
 
     // POST to node
 
-    console.log(
-      JSON.stringify({
-        issuer_public_key: issuerPublicKey,
-        holder_did: holderDid,
-        vc: signedVc,
-      })
-    );
-
     const putVCRes = await fetch("http://13.212.246.61/putVC", {
       method: "POST",
       headers: {

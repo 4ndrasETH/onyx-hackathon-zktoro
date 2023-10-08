@@ -9,7 +9,7 @@ import {
 } from "@jpmorganchase/onyx-ssi-sdk";
 import { NextRequest, NextResponse } from "next/server";
 // export const fetchCache = 'force-no-store';
-export const fetchCache = 'force-no-store'
+export const fetchCache = "force-no-store";
 export async function GET(request: NextRequest) {
   try {
     // call signVPTemporary
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
     });
     const vp = await retrieveVPRes.text();
 
-    console.log(signVPTemporaryText, vp);
+    console.log(JSON.stringify(signVPTemporaryText));
+    console.log(JSON.stringify(vp));
 
     const didKey = new KeyDIDMethod();
     const didEthr = new EthrDIDMethod(ethrProvider);
@@ -44,6 +45,7 @@ export async function GET(request: NextRequest) {
       vp,
     });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({
       error: (error as Error).message,
     });
