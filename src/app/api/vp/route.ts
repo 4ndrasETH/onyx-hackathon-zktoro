@@ -8,6 +8,7 @@ import {
   verifyPresentationJWT,
 } from "@jpmorganchase/onyx-ssi-sdk";
 import { NextRequest, NextResponse } from "next/server";
+export const fetchCache = 'force-no-store';
 
 export async function GET(request: NextRequest) {
   try {

@@ -7,6 +7,8 @@ interface Props {
   vc?: string;
   updateNode: (verified: boolean) => void;
 }
+export const fetchCache = 'force-no-store';
+
 export default function VerifyStatus({ status, vc, updateNode }: Props) {
   const [loading, setLoading] = useState(false);
 
