@@ -8,7 +8,7 @@ const name = process.env.NEXT_PUBLIC_NETWORK_NAME as string;
 export const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
 export const ethrProvider = {
   name,
-  chainId,
+  chainId: parseInt(chainId),
   rpcUrl,
   registry,
   gasSource: "",
