@@ -1,4 +1,16 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-module.exports = nextConfig
+module.exports = {
+    async headers() {
+      return [
+        {
+          source: '/api/vp',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'no-store', // Matched parameters can be used in the value
+            },
+          ],
+        },
+      ]
+    },
+  }
