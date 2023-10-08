@@ -14,25 +14,8 @@ export async function POST(request: NextRequest) {
   try {
     const res = await request.json();
 
-    const vc = res.vc;
-    console.log(vc);
-
-    // call signVPTemporary
-    // node signs the VP
-    const signVPTemporaryRes = await fetch(
-      "http://13.212.246.61/signVP_temporary",
-      { cache: "no-store" }
-    );
-    const signVPTemporaryText = await signVPTemporaryRes.text();
-
-    // GET VP from node
-    const retrieveVPRes = await fetch("http://13.212.246.61/retrieveVP", {
-      cache: "no-store",
-    });
-    const vp = await retrieveVPRes.text();
-
-    console.log(JSON.stringify(signVPTemporaryText));
-    console.log(JSON.stringify(vp));
+    const vp = res.vp;
+    console.log("check vp", vp);
 
     const didKey = new KeyDIDMethod();
     const didEthr = new EthrDIDMethod(ethrProvider);
@@ -53,8 +36,6 @@ export async function POST(request: NextRequest) {
       console.error(error);
       return NextResponse.json({
         error: (error as Error).message,
-        signVPTemporaryText,
-        vp,
       });
     }
   } catch (error) {

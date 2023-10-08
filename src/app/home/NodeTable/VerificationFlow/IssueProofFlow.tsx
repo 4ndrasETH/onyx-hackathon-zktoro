@@ -131,6 +131,7 @@ function IssueProofModal({
 
       const newStatusRes = await fetch(`/api/vp`, {
         method: "POST",
+        body: JSON.stringify({ vc: signedVc }),
         cache: "no-store",
         headers: { "Cache-Control": "no-store" },
       });

@@ -13,9 +13,10 @@ export default function useVerifyVP({ vp }: Pick<Node, "vp">) {
     setLoading(true);
 
     console.log("verifying vp");
-    const newStatusRes = await fetch(`/api/vp`, {
+    const newStatusRes = await fetch(`/api/vp/check`, {
       method: "POST",
       cache: "no-store",
+      body: JSON.stringify({ vp }),
       headers: { "Cache-Control": "no-store" },
     });
     const newStatusJson = await newStatusRes.json();
