@@ -133,7 +133,7 @@ function IssueProofModal({
       const newStatusJson = await newStatusRes.json();
 
       if (newStatusJson.error) {
-        console.error(newStatusJson.error);
+        console.error(JSON.stringify(newStatusJson, null, 2));
         toast({
           variant: "destructive",
           title: "Uh oh! Something went wrong.",

@@ -32,18 +32,26 @@ export async function GET(request: NextRequest) {
     const didKey = new KeyDIDMethod();
     const didEthr = new EthrDIDMethod(ethrProvider);
     const didResolver = getSupportedResolvers([didKey, didEthr]);
-    const isVpJwtValid = await verifyPresentationJWT(vp, didResolver);
-    console.log(isVpJwtValid);
+    try {
+      const isVpJwtValid = await verifyPresentationJWT(vp, didResolver);
+      console.log(isVpJwtValid);
+      if (!isVpJwtValid) throw new Error("VP JWT is not valid");
 
-    if (!isVpJwtValid) throw new Error("VP JWT is not valid");
+      const vcJwt = getCredentialsFromVP(vp)[0];
+      const vcVerified = await verifyDIDs(vcJwt, didResolver);
 
-    const vcJwt = getCredentialsFromVP(vp)[0];
-    const vcVerified = await verifyDIDs(vcJwt, didResolver);
-
-    return NextResponse.json({
-      status: vcVerified,
-      vp,
-    });
+      return NextResponse.json({
+        status: vcVerified,
+        vp,
+      });
+    } catch (error) {
+      console.error(error);
+      return NextResponse.json({
+        error: (error as Error).message,
+        signVPTemporaryText,
+        vp,
+      });
+    }
   } catch (error) {
     console.error(error);
     return NextResponse.json({
