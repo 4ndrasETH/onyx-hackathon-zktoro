@@ -11,7 +11,7 @@ export const ReadNodesContext = React.createContext<Node[]>(nodesInitialState);
 
 export const SetNodesContext = React.createContext<{
   append: (node: Node) => void;
-  update: <T extends keyof Node>(did: string, prop: T, value: Node[T]) => void;
+  update: (did: string, newNode: Partial<Node>) => void;
   remove: (did: string) => void;
 }>({ append: noop, update: noop, remove: noop });
 
@@ -35,11 +35,11 @@ export function NodesContextProvider({
       append: (node: Node) => {
         setNodes((prevNodes) => [...prevNodes, node]);
       },
-      update: <T extends keyof Node>(did: string, prop: T, value: Node[T]) => {
+      update: (did: string, newNode: Partial<Node>) => {
         setNodes((prevNodes) => {
           return prevNodes.map((node) => {
             if (node.did === did) {
-              return { ...node, [prop]: value };
+              return { ...node, ...newNode };
             }
             return node;
           });

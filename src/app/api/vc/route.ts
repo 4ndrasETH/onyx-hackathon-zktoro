@@ -12,29 +12,34 @@ import path from "path";
 import { ethrProvider } from "@/lib/config";
 
 export interface CreateVCTemplateRequestBody {
-  worldcoin: string;
+  worldIdResult: string;
+  nullifierHash: string;
   issuer: string;
   subject: string;
 }
 
 export async function POST(request: NextRequest) {
-  const res = await request.json();
+  const res: CreateVCTemplateRequestBody = await request.json();
 
-  const worldcoin: string = res.worldcoin;
-  const issuerDid: string = res.issuer;
-  const subjectDid: string = res.subject;
+  const worldIdResult = res.worldIdResult;
+  const nullifierHash = res.nullifierHash;
+  const issuerDid = res.issuer;
+  const subjectDid = res.subject;
 
-  if (!issuerDid || !subjectDid || !worldcoin) {
+  if (!issuerDid || !subjectDid || !worldIdResult || !nullifierHash) {
     return NextResponse.json({
-      error: "issuer, subject and worldcoin are required",
+      error: "issuer, subject, nullifierHash and worldIdResult are required",
     });
   }
 
   const vcDidKey = (await new KeyDIDMethod().create()).did;
   const credentialType = "PROOF_OF_CONTROLLER";
 
-  console.log(worldcoin);
-  const subjectData = { controller: issuerDid, worldcoin };
+  const subjectData = {
+    controller: issuerDid,
+    world_id_result: worldIdResult,
+    nullifier_hash: nullifierHash,
+  };
 
   const additionalParams = {
     id: vcDidKey,

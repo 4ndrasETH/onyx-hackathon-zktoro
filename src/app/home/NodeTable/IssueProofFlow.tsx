@@ -19,6 +19,7 @@ import { IdCardIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { Issuer, createVerifiableCredentialJwt } from "did-jwt-vc";
 import { EthrDID } from "ethr-did";
 import React, { useCallback } from "react";
+import { Node } from "./NodeTable";
 
 function convertIssuer(issuerDid: EthrDID) {
   const issuer = {
@@ -29,17 +30,20 @@ function convertIssuer(issuerDid: EthrDID) {
   return issuer as Issuer;
 }
 
-interface Props extends Required<Pick<DialogProps, "open" | "onOpenChange">> {
-  did: string;
-  worldcoin: string;
-  updateNode: (vc: string) => void;
+interface Props
+  extends Required<Pick<DialogProps, "open" | "onOpenChange">>,
+    Pick<Node, "did"> {
+  worldIdResult: string;
+  nullifierHash: string;
+  updateNode: (vp: string) => void;
 }
 
 function IssueProofModal({
   open,
   onOpenChange,
   did: subjectDid,
-  worldcoin,
+  worldIdResult,
+  nullifierHash,
   updateNode,
 }: Props) {
   const { did: issuerDid } = useAuthUser();
@@ -55,7 +59,8 @@ function IssueProofModal({
       const createVCTemplateRequestBody: CreateVCTemplateRequestBody = {
         issuer: issuerDid.did,
         subject: subjectDid,
-        worldcoin,
+        worldIdResult,
+        nullifierHash,
       };
       // Get VC template
       const vcTemplateRes = await fetch(`/api/vc?`, {
@@ -92,7 +97,7 @@ function IssueProofModal({
         vcTemplate,
         convertIssuer(issuerDid)
       );
-      console.log(signedJWT);
+      console.log("signed VC", signedJWT);
 
       await delay(1000);
 
@@ -123,7 +128,32 @@ function IssueProofModal({
       }
 
       const signedVc = verifyVcJson.vc;
-      updateNode(signedVc);
+
+      const newStatusRes = await fetch(`/api/vp`, { cache: "no-store" });
+      const newStatusJson = await newStatusRes.json();
+
+      if (newStatusJson.error) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+        });
+        setStatusMsg(undefined);
+        setLoading(false);
+        return;
+      }
+      if (!newStatusJson.status) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+        });
+        setStatusMsg(undefined);
+        setLoading(false);
+        return;
+      }
+
+      updateNode(newStatusJson.vp);
       setStatusMsg(undefined);
       setLoading(false);
       toast({
@@ -185,15 +215,17 @@ function IssueProofModal({
 export default function IssueProofFlow({
   did,
   updateNode,
-  worldcoin,
-}: Pick<Props, "did" | "worldcoin" | "updateNode">) {
+  worldIdResult,
+  nullifierHash,
+}: Pick<Props, "did" | "worldIdResult" | "nullifierHash" | "updateNode">) {
   const { key, isOpen, openModal, closeModal } = useDialogState();
 
   return (
     <IssueProofModal
       key={key}
       did={did}
-      worldcoin={worldcoin}
+      worldIdResult={worldIdResult}
+      nullifierHash={nullifierHash}
       updateNode={updateNode}
       open={isOpen}
       onOpenChange={(open) => {

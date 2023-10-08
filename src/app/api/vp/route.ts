@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       "http://13.212.246.61/signVP_temporary",
       { cache: "no-store" }
     );
-    await signVPTemporaryRes.text();
+    const signVPTemporaryText = await signVPTemporaryRes.text();
 
     // GET VP from node
     const retrieveVPRes = await fetch("http://13.212.246.61/retrieveVP", {
@@ -26,10 +26,13 @@ export async function GET(request: NextRequest) {
     });
     const vp = await retrieveVPRes.text();
 
+    console.log(signVPTemporaryText, vp);
+
     const didKey = new KeyDIDMethod();
     const didEthr = new EthrDIDMethod(ethrProvider);
     const didResolver = getSupportedResolvers([didKey, didEthr]);
     const isVpJwtValid = await verifyPresentationJWT(vp, didResolver);
+    console.log(isVpJwtValid);
 
     if (!isVpJwtValid) throw new Error("VP JWT is not valid");
 
@@ -38,6 +41,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       status: vcVerified,
+      vp,
     });
   } catch (error) {
     return NextResponse.json({

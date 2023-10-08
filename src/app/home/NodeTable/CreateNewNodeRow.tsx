@@ -27,7 +27,7 @@ export default function CreateNewNodeRow({ append }: CreateNewNodeRowProps) {
             }
           }}
           onSubmit={(nodeDid: string) => {
-            append({ did: nodeDid, verified: false });
+            append({ did: nodeDid });
             closeModal();
           }}
           trigger={

@@ -1,14 +1,14 @@
 import { VerifyReply } from "@/app/api/worldcoin/verify/route";
 import { Button } from "@/components/ui/Button";
 import { toast } from "@/components/ui/Toast/useToast";
-import { GlobeIcon, ReloadIcon } from "@radix-ui/react-icons";
+import { GlobeIcon } from "@radix-ui/react-icons";
 import { CredentialType, IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
 import React, { useCallback } from "react";
 
 export default function VerifyWithWorldcoinButton({
   updateNode,
 }: {
-  updateNode: (nullifierHash: string) => void;
+  updateNode: (worldIdResult: string, nullifierHash: string) => void;
 }) {
   const handleVerify = useCallback(async (result: ISuccessResult) => {
     console.log("Proof received from IDKit:\n", JSON.stringify(result)); // Log the proof from IDKit to the console for visibility
@@ -33,15 +33,15 @@ export default function VerifyWithWorldcoinButton({
       },
       body: reqBodyString,
     });
-    const { code, detail, data }: VerifyReply = await res.json();
+    const { code, detail, nullifierHash }: VerifyReply = await res.json();
 
     if (code === "success") {
       console.log("Successful response from backend:\n", {
         code,
         detail,
-        data,
+        nullifierHash,
       }); // Log the response from our backend for visibility
-      updateNode(data);
+      updateNode(reqBodyString, nullifierHash);
     } else {
       toast({
         variant: "destructive",

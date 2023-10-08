@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export type VerifyReply = {
   code: string;
   detail: string;
-  data: string;
+  nullifierHash: string;
 };
 
 const verifyEndpoint = `${process.env.NEXT_PUBLIC_WLD_API_BASE_URL}/api/v1/verify/${process.env.NEXT_PUBLIC_WLD_APP_ID}`;
@@ -45,15 +45,10 @@ export async function POST(req: NextRequest) {
       wldResponse.nullifier_hash
     );
 
-    const data = JSON.stringify({
-      ...reqBody,
-      response: wldResponse,
-    });
-
     return NextResponse.json({
       code: "success",
       detail: "This action verified correctly!",
-      data,
+      nullifierHash: wldResponse.nullifier_hash,
     });
     //   resolve(void 0);
   } else {
