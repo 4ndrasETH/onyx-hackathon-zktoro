@@ -32,9 +32,16 @@ function NodeDidCard({ did }: { did: string }) {
 interface Props {
   trigger: React.ReactNode;
   onSubmit: (nodeDid: string) => void;
+  open: boolean;
+  onOpenChange: (toState: boolean) => void;
 }
 
-export default function NodeKeyInputModal({ trigger, onSubmit }: Props) {
+export default function NodeKeyInputModal({
+  trigger,
+  onSubmit,
+  open,
+  onOpenChange,
+}: Props) {
   const [key, setKey] = useState("");
   const debouncedKey = useDebounce<string>(key, 500);
   const [loading, setLoading] = useState(false);
@@ -81,7 +88,7 @@ export default function NodeKeyInputModal({ trigger, onSubmit }: Props) {
   }, [debouncedKey, transformPublicKeyToDid]);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-[425px]">
         <DialogHeader>
