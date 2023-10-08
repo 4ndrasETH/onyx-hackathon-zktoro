@@ -1,13 +1,13 @@
 import { delay } from "@/lib/utils";
 import { CheckIcon, Cross2Icon, ReloadIcon } from "@radix-ui/react-icons";
 import React, { useEffect, useState } from "react";
-
+import { headers } from 'next/headers'
 interface Props {
   status: boolean;
   vc?: string;
   updateNode: (verified: boolean) => void;
 }
-export const fetchCache = 'force-no-store';
+// export const fetchCache = 'force-no-store';
 
 export default function VerifyStatus({ status, vc, updateNode }: Props) {
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ export default function VerifyStatus({ status, vc, updateNode }: Props) {
     setLoading(true);
 
     let newStatus = false;
-    const newStatusRes = await fetch(`/api/vp?timestamp=${Date.now()}`,{cache: "no-store"});
+    const newStatusRes = await fetch(`/api/vp`,{cache: "no-cache"});
     const newStatusJson = await newStatusRes.json();
     if (newStatusJson.error) {
       console.error(newStatusJson.error);
