@@ -12,7 +12,8 @@ export const ReadNodesContext = React.createContext<Node[]>(nodesInitialState);
 export const SetNodesContext = React.createContext<{
   append: (node: Node) => void;
   update: <T extends keyof Node>(did: string, prop: T, value: Node[T]) => void;
-}>({ append: noop, update: noop });
+  remove: (did: string) => void;
+}>({ append: noop, update: noop, remove: noop });
 
 export function useReadNodes() {
   return React.useContext(ReadNodesContext);
@@ -42,6 +43,11 @@ export function NodesContextProvider({
             }
             return node;
           });
+        });
+      },
+      remove: (did: string) => {
+        setNodes((prevNodes) => {
+          return prevNodes.filter((node) => node.did !== did);
         });
       },
     };

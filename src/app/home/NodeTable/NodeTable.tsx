@@ -11,6 +11,9 @@ import VerifyStatus from "./VerifyStatus";
 import ControllingStatus from "./ControllingStatus";
 import { truncateDidKey } from "@/lib/utils";
 import { useReadNodes, useSetNodes } from "@/components/contexts/NodesContext";
+import { MinusIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/Button";
+import RemoveNode from "./RemoveNode";
 
 export interface Node {
   did: string;
@@ -20,7 +23,7 @@ export interface Node {
 
 export default function NodeTable() {
   const nodes = useReadNodes();
-  const { append, update } = useSetNodes();
+  const { append, update, remove } = useSetNodes();
   return (
     <Table>
       <TableHeader>
@@ -33,7 +36,16 @@ export default function NodeTable() {
       <TableBody>
         {nodes.map(({ did, verified, vc }) => (
           <TableRow key={did}>
-            <TableCell className="font-medium">{truncateDidKey(did)}</TableCell>
+            <TableCell className="font-medium">
+              <div className="flex items-center justify-center gap-2">
+                <RemoveNode
+                  onConfirm={() => {
+                    remove(did);
+                  }}
+                />
+                {truncateDidKey(did)}
+              </div>
+            </TableCell>
             <TableCell className="text-right">
               <VerifyStatus
                 status={verified}
