@@ -15,7 +15,8 @@ export async function POST(request: NextRequest) {
     const res = await request.json();
 
     const vc = res.vc;
-    console.log(vc);
+    const date = res.date;
+    console.log(vc, date);
 
     // call signVPTemporary
     // node signs the VP

@@ -15,7 +15,8 @@ export async function POST(request: NextRequest) {
     const res = await request.json();
 
     const vp = res.vp;
-    console.log("check vp", vp);
+    const date = res.date;
+    console.log("check vp", vp, date);
 
     const didKey = new KeyDIDMethod();
     const didEthr = new EthrDIDMethod(ethrProvider);

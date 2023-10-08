@@ -63,7 +63,7 @@ function IssueProofModal({
         nullifierHash,
       };
       // Get VC template
-      const vcTemplateRes = await fetch(`/api/vc?`, {
+      const vcTemplateRes = await fetch(`/api/vc`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ function IssueProofModal({
 
       const newStatusRes = await fetch(`/api/vp`, {
         method: "POST",
-        body: JSON.stringify({ vc: signedVc }),
+        body: JSON.stringify({ vc: signedVc, date: Date.now() }),
         cache: "no-store",
         headers: { "Cache-Control": "no-store" },
       });
