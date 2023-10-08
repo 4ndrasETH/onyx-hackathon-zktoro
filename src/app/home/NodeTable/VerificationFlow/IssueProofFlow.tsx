@@ -20,8 +20,34 @@ import { Issuer, createVerifiableCredentialJwt } from "did-jwt-vc";
 import { EthrDID } from "ethr-did";
 import React, { useCallback, useState } from "react";
 import { Node } from "../NodeTable";
-import Large from "@/components/ui/Typography/Large";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/components/ui/Progress";
+// @ts-expect-error
+import { Web3Storage } from "web3.storage";
+
+function getAccessToken() {
+  // If you're just testing, you can paste in a token
+  // and uncomment the following line:
+  // return 'paste-your-token-here'
+
+  // In a real app, it's better to read an access token from an
+  // environement variable or other configuration that's kept outside of
+  // your code base. For this to work, you need to set the
+  // WEB3STORAGE_TOKEN environment variable before you run your code.
+  return process.env.NEXT_PUBLIC_WEB3STORAGE_TOKEN;
+}
+
+function makeStorageClient() {
+  return new Web3Storage({ token: getAccessToken() });
+}
+
+async function storeFiles(vp: string) {
+  const blob = new Blob([vp]);
+  const file = new File([blob], "vp.txt");
+  const client = makeStorageClient();
+  const cid = await client.put([file]);
+  console.log("stored files with cid:", cid);
+  return cid;
+}
 
 function convertIssuer(issuerDid: EthrDID) {
   const issuer = {
@@ -37,7 +63,7 @@ interface Props
     Pick<Node, "did"> {
   worldIdResult: string;
   nullifierHash: string;
-  updateNode: (vp: string) => void;
+  updateNode: (vp: string, file?: string) => void;
 }
 
 const steps = [
@@ -46,6 +72,7 @@ const steps = [
   { text: "Sign Proof with delegate keypair" },
   { text: "Upload Proof to node" },
   { text: "Verify the node's signature" },
+  { text: "Upload Proof to IPFS" },
 ];
 
 function IssueProofModal({
@@ -172,7 +199,10 @@ function IssueProofModal({
         return;
       }
 
-      updateNode(newStatusJson.vp);
+      setStep((prev) => prev + 1);
+      const ipfsRes = await storeFiles(newStatusJson.vp);
+
+      updateNode(newStatusJson.vp, ipfsRes);
       setStep((prev) => prev + 1);
       setLoading(false);
       toast({

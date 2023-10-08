@@ -57,8 +57,8 @@ export default function VerificationFlow({
         did={did}
         worldIdResult={worldIdResult}
         nullifierHash={nullifierHash}
-        updateNode={(vp) => {
-          update(did, { vp });
+        updateNode={(vp, file) => {
+          update(did, { vp, file });
         }}
       />
     );
