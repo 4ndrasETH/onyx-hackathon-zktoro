@@ -15,7 +15,7 @@ export default function VerifyStatus({ status, vc, updateNode }: Props) {
     setLoading(true);
 
     let newStatus = false;
-    const newStatusRes = await fetch(`/api/vp`);
+    const newStatusRes = await fetch(`/api/vp`,{cache: "no-store"});
     const newStatusJson = await newStatusRes.json();
     if (newStatusJson.error) {
       console.error(newStatusJson.error);
