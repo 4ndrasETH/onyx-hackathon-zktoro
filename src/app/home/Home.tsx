@@ -11,7 +11,7 @@ import {
   NodesContextProvider,
   useReadNodes,
 } from "@/components/contexts/NodesContext";
-
+import WorldCoin from "../login/WorldCoin";
 function AddNodeTip() {
   const nodes = useReadNodes();
 
@@ -22,6 +22,7 @@ function AddNodeTip() {
       <AlertTitle>Tip:</AlertTitle>
       <AlertDescription>
         Add a new node for your strategy below
+        <WorldCoin />
       </AlertDescription>
     </Alert>
   );
@@ -37,6 +38,7 @@ function IssueProofTip() {
       <AlertTitle>Tip:</AlertTitle>
       <AlertDescription>
         Issue a proof that you will control the node
+        <WorldCoin />
       </AlertDescription>
     </Alert>
   );
