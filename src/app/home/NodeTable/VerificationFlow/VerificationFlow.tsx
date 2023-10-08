@@ -5,7 +5,7 @@ import { Node } from "../NodeTable";
 import VerifyWithWorldcoinButton from "./VerifyWithWorldcoinButton";
 import { useSetNodes } from "@/components/contexts/NodesContext";
 import { CheckIcon, ReloadIcon } from "@radix-ui/react-icons";
-import IssueProofFlow from "../IssueProofFlow";
+import IssueProofFlow from "./IssueProofFlow";
 
 export default function VerificationFlow({
   did,

@@ -19,7 +19,7 @@ import { IdCardIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { Issuer, createVerifiableCredentialJwt } from "did-jwt-vc";
 import { EthrDID } from "ethr-did";
 import React, { useCallback } from "react";
-import { Node } from "./NodeTable";
+import { Node } from "../NodeTable";
 
 function convertIssuer(issuerDid: EthrDID) {
   const issuer = {
@@ -129,7 +129,11 @@ function IssueProofModal({
 
       const signedVc = verifyVcJson.vc;
 
-      const newStatusRes = await fetch(`/api/vp`, { cache: "no-store" });
+      const newStatusRes = await fetch(`/api/vp`, {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Cache-Control": "no-store" },
+      });
       const newStatusJson = await newStatusRes.json();
 
       if (newStatusJson.error) {

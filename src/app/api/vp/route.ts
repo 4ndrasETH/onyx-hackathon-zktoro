@@ -10,7 +10,7 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 // export const fetchCache = 'force-no-store';
 export const fetchCache = "force-no-store";
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     // call signVPTemporary
     // node signs the VP
